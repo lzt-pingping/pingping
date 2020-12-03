@@ -25,3 +25,20 @@ zuul:
   prefix: /api # 添加路由前缀
   routes:
     item-service: /item/** # 将商品微服务映射到/item/**
+ly:
+  cors:
+    allowedOrigins:
+      - http://www.pingping.com
+      - http://manage.pingping.com
+    allowedCredentials: true
+    allowedHeaders:
+      - "*"
+    allowedMethods:
+      - GET
+      - POST
+      - DELETE
+      - PUT
+      - OPTIONS
+      - HEAD
+    maxAge: 360000
+    filterPath: "/**"
