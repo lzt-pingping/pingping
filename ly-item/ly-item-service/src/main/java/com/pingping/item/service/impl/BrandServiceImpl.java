@@ -13,6 +13,7 @@ import com.pingping.item.dto.BrandDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -51,6 +52,25 @@ public class BrandServiceImpl implements BrandService {
         List<BrandDTO> brandDTOS = BeanHelper.copyWithCollection(brandPage.getRecords(), BrandDTO.class);
 
         return new PageResult<BrandDTO>(brandPage.getTotal(), brandDTOS);
+    }
+
+    @Override
+    @Transactional
+    public void saveBrand(BrandDTO brandDTO, List<Long> ids) {
+        // 新增品牌
+        Brand brand = BeanHelper.copyProperties(brandDTO, Brand.class);
+        int count = brandMapper.insert(brand);
+        if(count != 1){
+            // 新增失败，抛出异常
+            throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
+        // 新增品牌和分类中间表
+        count = brandMapper.insertCategoryBrand(brand.getId(), ids);
+        // 如果新增到中间表的数量和ids的数量不一致说明新增失败
+        if(count != ids.size()){
+            // 新增失败，抛出异常
+            throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
     }
 }
 

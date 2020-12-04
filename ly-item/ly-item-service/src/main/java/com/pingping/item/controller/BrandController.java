@@ -4,11 +4,11 @@ import com.pingping.item.service.BrandService;
 import com.pingping.common.vo.PageResult;
 import com.pingping.item.dto.BrandDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("brand")
@@ -27,5 +27,15 @@ public class BrandController {
     ){
         return ResponseEntity
             .ok(brandService.queryBrandByPage(page,rows, key, sortBy, desc));
+    }
+    /**
+     * 新增品牌
+     * @param brand
+     * @return
+     */
+    @PostMapping
+    public ResponseEntity<Void> saveBrand(BrandDTO brand, @RequestParam("cids") List<Long> ids) {
+        brandService.saveBrand(brand, ids);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
