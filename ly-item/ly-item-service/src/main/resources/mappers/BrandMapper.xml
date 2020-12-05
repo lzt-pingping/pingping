@@ -5,8 +5,8 @@
 
     <insert id="insertCategoryBrand">
         INSERT INTO tb_category_brand (category_id, brand_id)
-        <foreach collection="ids" open="VALUES" separator="," item="id">
-            (#{id}, #{bid})
+        <foreach collection="ids" open="VALUES" separator="," item="cid">
+            (#{cid}, #{bid})
         </foreach>
     </insert>
 </mapper>

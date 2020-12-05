@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 @RestController
-@RequestMapping("upload")
 public class UploadController {
     @Autowired
     private UploadService uploadService;
