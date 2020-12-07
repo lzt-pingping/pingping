@@ -80,5 +80,14 @@ public class BrandServiceImpl implements BrandService {
         }
         return BeanHelper.copyProperties(brand, BrandDTO.class);
     }
+    @Override
+    public List<BrandDTO> queryByCategoryId(Long categoryId) {
+        List<Brand> list = brandMapper.queryByCategoryId(categoryId);
+        // 判断是否为空
+        if(CollectionUtils.isEmpty(list)){
+            throw new LyException(ExceptionEnum.BRAND_NOT_FOUND);
+        }
+        return BeanHelper.copyWithCollection(list, BrandDTO.class);
+    }
 }
 

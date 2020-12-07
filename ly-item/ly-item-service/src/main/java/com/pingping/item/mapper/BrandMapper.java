@@ -10,4 +10,6 @@ import java.util.List;
 @Mapper
 public interface BrandMapper extends BaseMapper<Brand> {
     int insertCategoryBrand(@Param("bid")Long id, @Param("ids")List<Long> ids);
+
+    List<Brand> queryByCategoryId(Long categoryId);
 }

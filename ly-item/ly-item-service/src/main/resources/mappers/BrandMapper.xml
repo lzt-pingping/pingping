@@ -9,4 +9,9 @@
             (#{cid}, #{bid})
         </foreach>
     </insert>
+    <select id="queryByCategoryId" parameterType="long" resultType="com.pingping.item.entity.Brand">
+        SELECT b.id, b.name, b.letter, b.image FROM tb_category_brand cb
+        INNER JOIN tb_brand b ON b.id = cb.brand_id
+        WHERE cb.category_id = #{categoryId}
+    </select>
 </mapper>
