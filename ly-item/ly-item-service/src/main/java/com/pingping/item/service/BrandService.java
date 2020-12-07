@@ -8,4 +8,5 @@ import java.util.List;
 public interface BrandService {
     PageResult<BrandDTO> queryBrandByPage(Integer page, Integer rows, String key, String sortBy, Boolean desc);
     void saveBrand(BrandDTO brand, List<Long> ids);
+    BrandDTO queryBrandById(Long id);
 }

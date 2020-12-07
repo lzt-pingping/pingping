@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface CategoryService {
     List<CategoryDTO> queryListByParent(Long pid);
+    List<CategoryDTO> queryCategoryByIds(List<Long> ids);
 }

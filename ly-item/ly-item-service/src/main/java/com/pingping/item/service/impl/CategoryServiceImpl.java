@@ -11,6 +11,7 @@ import com.pingping.common.utils.BeanHelper;
 import com.pingping.item.dto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -35,5 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 使用自定义工具类，把Category集合转为DTO的集合
         return BeanHelper.copyWithCollection(categories, CategoryDTO.class);
+    }
+    @Override
+    public List<CategoryDTO> queryCategoryByIds(List<Long> ids){
+        List<Category> list = categoryMapper.selectBatchIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            // 没找到，返回404
+            throw new LyException(ExceptionEnum.CATEGORY_NOT_FOUND);
+        }
+        return BeanHelper.copyWithCollection(list, CategoryDTO.class);
     }
 }

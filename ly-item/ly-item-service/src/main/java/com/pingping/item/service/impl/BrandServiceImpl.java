@@ -72,5 +72,13 @@ public class BrandServiceImpl implements BrandService {
             throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
     }
+    @Override
+    public BrandDTO queryBrandById(Long id) {
+        Brand brand = brandMapper.selectById(id);
+        if (brand == null) {
+            throw new LyException(ExceptionEnum.BRAND_NOT_FOUND);
+        }
+        return BeanHelper.copyProperties(brand, BrandDTO.class);
+    }
 }
 
