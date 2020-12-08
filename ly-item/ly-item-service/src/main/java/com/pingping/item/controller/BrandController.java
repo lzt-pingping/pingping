@@ -47,4 +47,13 @@ public class BrandController {
     public ResponseEntity<List<BrandDTO>> queryByCategoryId(@RequestParam("id") Long categoryId) {
         return ResponseEntity.ok(brandService.queryByCategoryId(categoryId));
     }
+    /**
+     * 根据id查询品牌
+     * @param id
+     * @return
+     */
+    @GetMapping("{id}")
+    public ResponseEntity<BrandDTO> queryById(@PathVariable("id") Long id){
+        return ResponseEntity.ok(brandService.queryBrandById(id));
+    }
 }

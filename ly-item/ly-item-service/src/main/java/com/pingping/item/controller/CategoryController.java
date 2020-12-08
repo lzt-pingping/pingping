@@ -26,4 +26,12 @@ public class CategoryController {
     public ResponseEntity<List<CategoryDTO>> queryByParentId(@RequestParam("pid") Long pid) {
         return ResponseEntity.ok(categoryService.queryListByParent(pid));
     }
+    /**
+     * 根据id的集合查询商品分类
+     * @return 分类集合
+     */
+    @GetMapping("list")
+    public ResponseEntity<List<CategoryDTO>> queryByIds(@RequestParam("ids") List<Long> ids){
+        return ResponseEntity.ok(categoryService.queryCategoryByIds(ids));
+    }
 }

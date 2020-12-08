@@ -26,6 +26,7 @@ zuul:
   routes:
     item-service: /item/** # 将商品微服务映射到/item/**
     upload-service: /upload/**
+    search-service: /search/**
 ly:
   cors:
     allowedOrigins:
