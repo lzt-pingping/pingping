@@ -1,16 +1,29 @@
 package com.pingping.search.service.Impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.pingping.common.enums.ExceptionEnum;
+import com.pingping.common.exceptions.LyException;
+import com.pingping.common.utils.BeanHelper;
 import com.pingping.common.utils.JsonUtils;
+import com.pingping.common.vo.PageResult;
 import com.pingping.item.client.ItemClient;
 import com.pingping.item.dto.SkuDTO;
 import com.pingping.item.dto.SpecParamDTO;
 import com.pingping.item.dto.SpuDTO;
 import com.pingping.item.dto.SpuDetailDTO;
+import com.pingping.search.dto.GoodsDTO;
+import com.pingping.search.dto.SearchRequest;
 import com.pingping.search.pojo.Goods;
 import com.pingping.search.service.SearchService;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,6 +33,9 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
     @Autowired
     private ItemClient itemClient;
+
+    @Autowired
+    private ElasticsearchTemplate esTemplate;
     /**
      * 通过该方法将spu对象转成goods对象
      *
@@ -96,6 +112,46 @@ public class SearchServiceImpl implements SearchService {
         goods.setSpecs(specMap);  //规格参数的Map<String,Object>
         goods.setId(spu.getId());  //spu的id作为_id索引库的唯一值
         return goods;
+    }
+
+    @Override
+    public PageResult<GoodsDTO> search(SearchRequest searchRequest) {
+        /**
+         * 1.判断关键字是否有值，没有抛异常
+         * 2.new NativeSearchQueryBuilder原生查询构造器
+         * 3.构造器中通过SourceFilter只抓取"id","subTitle","skus"字段内容
+         * 4.构造器中设置查询条件，采用matchQuery，查询采用并且关系
+         * 5.设置分页参数PageRequest.of(pageNo-1,pageSize)
+         * 6.查询获取Goods结果,索引库保存的都是Goods
+         * 7.PageResult拼接返回结果
+         */
+
+        //1.判断关键字是否有值，没有抛异常
+        String key = searchRequest.getKey();
+        if (StringUtils.isBlank(key)) {
+            throw new LyException(ExceptionEnum.INVALID_PARAM_ERROR);
+        }
+
+        //2.new NativeSearchQueryBuilder原生查询构造器
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+
+        //3.构造器中通过SourceFilter只抓取"id","subTitle","skus"字段内容
+        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id","subTitle","skus"}, null));
+
+        //4.构造器中设置查询条件，采用matchQuery，查询采用并且关系
+        queryBuilder.withQuery(QueryBuilders.matchQuery("all", key).operator(Operator.AND));
+
+        //5.设置分页参数PageRequest.of(pageNo-1,pageSize)
+        queryBuilder.withPageable(PageRequest.of(searchRequest.getPage() - 1,searchRequest.getSize()));
+
+        //6.查询获取Goods结果,索引库保存的都是Goods
+        AggregatedPage<Goods> goods = esTemplate.queryForPage(queryBuilder.build(), Goods.class);
+
+        long totalElements = goods.getTotalElements();
+        int totalPages = goods.getTotalPages();
+        List<GoodsDTO> content = BeanHelper.copyWithCollection(goods.getContent(), GoodsDTO.class) ;
+
+        return new PageResult<>(totalElements, totalPages,content);
     }
 
     /**

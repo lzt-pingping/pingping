@@ -20,7 +20,7 @@ public class PageController {
     @GetMapping("item/{id}.html")
     public String toItemPage(Model model, @PathVariable("id")Long id){
         Map<String, Object> map = new HashMap<>();
-        map.put("msg", "");
+        map.put("msg", "跳转");
         model.addAllAttributes(map);
         return "item";
     }
